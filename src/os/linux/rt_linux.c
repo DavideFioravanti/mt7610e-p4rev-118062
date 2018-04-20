@@ -871,7 +871,11 @@ int RtmpOSFileClose(RTMP_OS_FD osfd)
 
 void RtmpOSFileSeek(RTMP_OS_FD osfd, int offset)
 {
-	osfd->f_pos = offset;
+	#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        	return osfd->f_op->write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	#else
+        	return __kernel_write(osfd, pDataPtr, (size_t) writeLen, &osfd->f_pos);
+	#endif
 }
 
 
